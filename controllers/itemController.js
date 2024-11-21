@@ -1,67 +1,69 @@
-const db = require('../models/database');
+const itemModel = require('../models/itemModel');
 
+// Display all items with pagination
 exports.getItems = (req, res) => {
-    db.all('SELECT * FROM items', [], (err,rows) => {
+    const page = parseInt(req.query.page) || 1; // Default to page 1
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+
+    // Get the total item count for pagination
+    itemModel.getItemCount((err, count) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.json(rows);
+            return res.status(500).send('Error retrieving item count');
         }
+
+        // Calculate the total number of pages
+        const totalPages = Math.ceil(count / limit);
+
+        // Fetch items with pagination
+        itemModel.getItemsWithPagination(page, limit, (err, items) => {
+            if (err) {
+                return res.status(500).send('Error retrieving items');
+            }
+
+            // Pass the data to the view
+            res.render('index', { items, page, limit, totalPages });
+        });
     });
 };
 
-exports.addItem = (req,res) => {
+// Add a new item
+exports.addItem = (req, res) => {
     const { name, description } = req.body;
-    db.run(
-        'INSERT INTO items (name,description) VALUES (?, ?)',
-        [name, description],
-        function (err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-            }else {
-                res.status(200).json({ id: this.lastID });
-            }
-        }
-    );
-};
-
-exports.updatteItem = (req,res) => {
-    const { id } = req.params;
-    const { name, description } = req.body;
-    db.run(
-        'UPDATE items SET name = ?, description = ? WHERE id = ?',
-        [name, description, id],
-        function (err) {
-            if (err) {
-                res.status(500).json({ error: err.message});
-            } else {
-                res.status(200).json({ changes: this.changes});
-            }
-        }
-    );
-};
-
-exports.patchItem = (req, res) => {
-    const { id } = req.params;
-    const fields = Object.entries(req.body)
-        .map(([key, value]) => `${key} = '${value}'`)
-        .join(', ');
-    db.run(`UPDATE items SET ${fields} WHERE id = ?`, [id], function (err) {
+    itemModel.addItem(name, description, (err, id) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.status(200).json({ changes: this.changes });
+            return res.status(500).send('Error adding item');
         }
+        res.redirect('/');
     });
 };
 
+// Update an item
+exports.updateItem = (req, res) => {
+    const { id } = req.params;
+    const { name, description } = req.body;
+
+    if (!name) {
+        return res.status(400).json({ error: 'Name is required' });
+    }
+
+    itemModel.updateItem(id, name, description, (err) => {
+        if (err) {
+            console.error('Error updating item:', err.message);
+            return res.status(500).json({ error: 'Error updating item' });
+        }
+        res.redirect('/');
+    });
+};
+
+// Delete an item
 exports.deleteItem = (req, res) => {
     const { id } = req.params;
-    db.run('DELETE FROM items WHERE id = ?', [id], function (err) {
+
+    itemModel.deleteItem(id, (err) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.status(200).json({ changes: this.changes });
+            console.error('Error deleting item:', err.message);
+            return res.status(500).json({ error: 'Error deleting item' });
         }
+        res.redirect('/');
     });
 };

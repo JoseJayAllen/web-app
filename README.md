@@ -15,7 +15,7 @@
 
 # How to Run Locally
 # Clone the Repository
-# 'git clone https://github.com/yourusername/repository-name.git'
+# 'git clone https://github.com/josejayallen/web-app.git'
 # Navigate to the Project Folder
 
 # 'cd repository-name'

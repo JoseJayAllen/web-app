@@ -26,18 +26,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
                     );
                 `);
                 console.log('Table "items" created.');
-
-                // Insert sample data (optional)
-                db.run(`
-                    INSERT INTO items (name, description)
-                    VALUES ('Sample Item', 'This is a sample item.');
-                `, (err) => {
-                    if (err) {
-                        console.error('Error inserting sample data:', err.message);
-                    } else {
-                        console.log('Sample data inserted.');
-                    }
-                });
             });
         }
     }

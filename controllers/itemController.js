@@ -3,7 +3,7 @@ const itemModel = require('../models/itemModel');
 // Display all items with pagination
 exports.getItems = (req, res) => {
     const page = parseInt(req.query.page) || 1; // Default to page 1
-    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const limit = parseInt(req.query.limit) || 4; // Default to 10 items per page
 
     // Get the total item count for pagination
     itemModel.getItemCount((err, count) => {

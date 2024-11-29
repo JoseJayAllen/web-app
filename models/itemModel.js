@@ -1,9 +1,8 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./database/items.db');
+const db = require('../db'); 
 
 // Function to get all items (without pagination)
 function getAllItems(callback) {
-    db.all('SELECT * FROM items BY id ASC', [], callback);
+    db.all('SELECT * FROM items ORDER BY id ASC', [], callback);
 }
 
 // Function to get the total count of items
@@ -12,7 +11,7 @@ function getItemCount(callback) {
         if (err) {
             callback(err);
         } else {
-            callback(null, row.count);  // Return the count value
+            callback(null, row.count); // Return the count value
         }
     });
 }
@@ -26,8 +25,8 @@ function getItemsWithPagination(page, limit, callback) {
 // Function to add a new item
 function addItem(name, description, callback) {
     const stmt = db.prepare('INSERT INTO items (name, description) VALUES (?, ?)');
-    stmt.run(name, description, function(err) {
-        callback(err, this.lastID);
+    stmt.run(name, description, function (err) {
+        callback(err, this.lastID); // Return the ID of the inserted item
     });
     stmt.finalize();
 }

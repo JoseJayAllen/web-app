@@ -18,7 +18,7 @@ Clone the Repository
 'git clone https://github.com/josejayallen/web-app.git'
 Navigate to the Project Folder
 
-'cd repository-name'
+'cd web-app'
 Install Dependencies Install the necessary dependencies using npm:
 npm install
 
